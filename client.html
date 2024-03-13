@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My First game</title>
+    <style>
+      #screen {
+        border: 10px solid gray;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        image-rendering: -moz-crisp-edges;
+        width: 400px;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="screen" width="10px" height="10px"></canvas>
+
+    <button id="freeze-btn">Congelar</button>
+
+    <script>
+      const screen = document.querySelector("canvas#screen");
+      const context = screen.getContext("2d");
+      const searchParams = new URLSearchParams(window.location.search);
+      function randomIntFromInterval(min, max) {
+        //
+        return Math.floor(Math.random() * (max - min + 1) + min);
+      }
+      const playerId = searchParams.get("player");
+
+      const freezeBtn = document.querySelector("#freeze-btn");
+
+      const game = createGame();
+      const keyboardListener = createKeyboardListener();
+
+      freezeBtn.addEventListener("click", (e) => {
+        const btn = e.target;
+        if (btn.innerText.toLowerCase() === "congelar") {
+          keyboardListener.unsubscribe("movePlayer");
+          btn.innerText = "Descongelar";
+          return;
+        }
+        if (btn.innerText.toLowerCase() === "descongelar") {
+          keyboardListener.subscribe({
+            id: "movePlayer",
+            callback: game.movePlayer,
+          });
+          btn.innerText = "Congelar";
+        }
+      });
+      keyboardListener.subscribe({
+        id: "movePlayer",
+        callback: game.movePlayer,
+      });
+
+      function createKeyboardListener() {
+        const state = {
+          observers: [],
+        };
+        const handleKeyPress = (e) => {
+          const keyPressed = e.key;
+
+          notifyAll({ playerId, keyPressed });
+        };
+        document.addEventListener("keydown", handleKeyPress);
+
+        function subscribe({ id, callback }) {
+          state.observers.push({ id, callback });
+        }
+        function unsubscribe(observerId) {
+          const observers = state.observers.filter(
+            ({ id }) => id !== observerId
+          );
+          state.observers = observers;
+        }
+        function notifyAll(command) {
+          console.log(state.observers);
+          console.log(`Notifying ${state.observers.length} observers`);
+          for (const { callback } of state.observers) {
+            callback(command);
+          }
+        }
+
+        return {
+          subscribe,
+          unsubscribe,
+        };
+      }
+
+      const clearScreen = () => {
+        context.fillStyle = "white";
+        context.fillRect(0, 0, 10, 10);
+      };
+
+      function createGame() {
+        function movePlayer({ playerId, keyPressed }) {
+          console.log(`Movie ${playerId} with ${keyPressed}`);
+          const player = state.palyers[playerId];
+
+          if (keyPressed === "ArrowDown" && player.y + 1 < 10) {
+            player.y += 1;
+          }
+          if (keyPressed === "ArrowUp" && player.y - 1 >= 0) {
+            player.y -= 1;
+          }
+          if (keyPressed === "ArrowLeft" && player.x - 1 >= 0) {
+            player.x -= 1;
+          }
+          if (keyPressed === "ArrowRight" && player.x + 1 < 10) {
+            player.x += 1;
+          }
+        }
+
+        const x = randomIntFromInterval(0, 9);
+        const y = randomIntFromInterval(0, 9);
+
+        console.log({
+          x,
+          y,
+        });
+
+        const state = {
+          palyers: {
+            [playerId]: {
+              x,
+              y,
+            },
+          },
+          fruits: {
+            fruit1: { x: 3, y: 1 },
+          },
+        };
+
+        return {
+          movePlayer,
+          state,
+        };
+      }
+
+      renderScreen();
+      function renderScreen() {
+        const SIZE = 1;
+        context.clearRect(0, 0, screen.width, screen.height);
+        for (const playerId in game.state.palyers) {
+          const player = game.state.palyers[playerId];
+          context.fillStyle = "black";
+          context.fillRect(player.x, player.y, SIZE, SIZE);
+        }
+        for (const fruitId in game.state.fruits) {
+          const fruit = game.state.fruits[fruitId];
+          context.fillStyle = "green";
+          context.fillRect(fruit.x, fruit.y, SIZE, SIZE);
+        }
+        requestAnimationFrame(renderScreen);
+      }
+    </script>
+  </body>
+</html>
