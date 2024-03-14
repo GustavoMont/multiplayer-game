@@ -72,11 +72,16 @@ export function createGame(screen) {
     delete state.players[playerId];
     notifyAll({ type: "remove-player", playerId });
   }
-  function addFruit({ fruitId, fruitX, fruitY }) {
+  function addFruit({
+    fruitId,
+    fruitX = generatePosition(screen.width),
+    fruitY = generatePosition(screen.width),
+  }) {
     state.fruits[fruitId] = {
       x: fruitX,
       y: fruitY,
     };
+    notifyAll({ type: "add-fruit", fruitX, fruitY, fruitId });
   }
   function removeFruit({ fruitId }) {
     delete state.fruits[fruitId];
@@ -91,6 +96,15 @@ export function createGame(screen) {
       }
     }
   }
+  function start() {
+    const frequency = 5000;
+    setInterval(() => {
+      addFruit({
+        fruitId: Math.random().toString(),
+      });
+    }, frequency);
+  }
+
   function setState(newState) {
     Object.assign(state, newState);
   }
@@ -103,6 +117,7 @@ export function createGame(screen) {
     removeFruit,
     setState,
     subscribe,
+    start,
     state,
   };
 }

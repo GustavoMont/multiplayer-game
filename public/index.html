@@ -72,6 +72,9 @@
       socket.on("remove-fruit", ({ fruitId }) => {
         game.removeFruit({ fruitId });
       });
+      socket.on("add-fruit", ({ fruitId, fruitY, fruitX }) => {
+        game.addFruit({ fruitId, fruitY, fruitX });
+      });
     </script>
   </body>
 </html>

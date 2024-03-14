@@ -22,7 +22,7 @@ game.subscribe({
   },
 });
 
-game.addFruit({ fruitId: "fruta", fruitX: 5, fruitY: 5 });
+game.start();
 
 io.on("connection", (socket) => {
   const playerId = socket.id;
