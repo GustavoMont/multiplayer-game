@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My First game</title>
+    <style>
+      #screen {
+        border: 10px solid gray;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        image-rendering: -moz-crisp-edges;
+        width: 400px;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="screen" width="10px" height="10px"></canvas>
+
+    <button id="freeze-btn">Congelar</button>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+      import { createKeyboardListener } from "./scripts/keyboard-listener.js";
+      import { createGame } from "./scripts/game.js";
+      import { renderScreen } from "./scripts/render-screen.js";
+      const screen = document.querySelector("canvas#screen");
+      const context = screen.getContext("2d");
+      const socket = io();
+      const game = createGame(screen);
+      const keyboardListener = createKeyboardListener(document);
+
+      socket.on("connect", () => {
+        const playerId = socket.id;
+        console.log(`Player connect in client with id: ${playerId}`);
+      });
+      socket.on("setup", (state) => {
+        const playerId = socket.id;
+        game.setState(state);
+
+        keyboardListener.setPlayer(playerId);
+        keyboardListener.subscribe({
+          id: "emit-move-player",
+          callback: game.movePlayer,
+        });
+        keyboardListener.subscribe({
+          id: "emit-move-player",
+          callback: ({ playerId, keyPressed, type }) => {
+            socket.emit("move-player", { type, playerId, keyPressed });
+          },
+        });
+
+        renderScreen({
+          game,
+          screen,
+          currentPlayerId: playerId,
+          requestAnimationFrame,
+        });
+      });
+      socket.on("add-player", ({ playerId, playerX, playerY }) => {
+        game.addPlayer({ playerId, playerX, playerY });
+      });
+      socket.on("remove-player", ({ playerId }) => {
+        game.removePlayer({ playerId });
+      });
+      socket.on("move-player", (command) => {
+        const playerId = socket.id;
+        if (command.playerId !== socket.id) {
+          game.movePlayer(command);
+        }
+      });
+    </script>
+  </body>
+</html>

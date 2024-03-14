@@ -1,10 +1,15 @@
-export function renderScreen({ game, screen, requestAnimationFrame }) {
+export function renderScreen({
+  game,
+  screen,
+  requestAnimationFrame,
+  currentPlayerId,
+}) {
   const SIZE = 1;
   const context = screen.getContext("2d");
   context.clearRect(0, 0, screen.width, screen.height);
   for (const playerId in game.state.players) {
     const player = game.state.players[playerId];
-    context.fillStyle = "black";
+    context.fillStyle = currentPlayerId === playerId ? "yellow" : "black";
     context.fillRect(player.x, player.y, SIZE, SIZE);
   }
   for (const fruitId in game.state.fruits) {
@@ -13,6 +18,6 @@ export function renderScreen({ game, screen, requestAnimationFrame }) {
     context.fillRect(fruit.x, fruit.y, SIZE, SIZE);
   }
   requestAnimationFrame(() =>
-    renderScreen({ screen, game, requestAnimationFrame })
+    renderScreen({ screen, game, requestAnimationFrame, currentPlayerId })
   );
 }

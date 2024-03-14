@@ -1,3 +1,5 @@
+const generatePosition = (max = 9) => Math.floor(Math.random() * max);
+
 export function createGame(screen) {
   const state = {
     players: {},
@@ -7,9 +9,21 @@ export function createGame(screen) {
       height: screen.height,
     },
   };
+  const observers = [];
+  console.log(observers);
+  function subscribe({ id, callback }) {
+    observers.push({ id, callback });
+  }
 
-  function movePlayer({ playerId, keyPressed }) {
+  function notifyAll(command) {
+    for (const { callback } of observers) {
+      callback(command);
+    }
+  }
+
+  function movePlayer({ type, playerId, keyPressed }) {
     const player = state.players[playerId];
+    notifyAll({ type, playerId, keyPressed });
     const onMoveDown = (player) => {
       if (player.y + 1 < 10) {
         player.y += 1;
@@ -43,14 +57,20 @@ export function createGame(screen) {
       checkFruitCollision(playerId);
     }
   }
-  function addPlayer({ playerId, playerX, playerY }) {
+  function addPlayer({
+    playerId,
+    playerX = generatePosition(screen.width),
+    playerY = generatePosition(screen.height),
+  }) {
     state.players[playerId] = {
       x: playerX,
       y: playerY,
     };
+    notifyAll({ type: "add-player", playerId, playerX, playerY });
   }
   function removePlayer({ playerId }) {
     delete state.players[playerId];
+    notifyAll({ type: "remove-player", playerId });
   }
   function addFruit({ fruitId, fruitX, fruitY }) {
     state.fruits[fruitId] = {
@@ -70,6 +90,9 @@ export function createGame(screen) {
       }
     }
   }
+  function setState(newState) {
+    Object.assign(state, newState);
+  }
 
   return {
     movePlayer,
@@ -77,6 +100,8 @@ export function createGame(screen) {
     removePlayer,
     addFruit,
     removeFruit,
+    setState,
+    subscribe,
     state,
   };
 }

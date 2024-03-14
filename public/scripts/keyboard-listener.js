@@ -2,10 +2,12 @@ export function createKeyboardListener(document) {
   const state = {
     observers: [],
   };
+
   const handleKeyPress = (e) => {
+    const playerId = state.playerId;
     const keyPressed = e.key;
 
-    notifyAll({ playerId: "player1", keyPressed });
+    notifyAll({ type: "move-player", playerId, keyPressed });
   };
   document.addEventListener("keydown", handleKeyPress);
 
@@ -21,9 +23,13 @@ export function createKeyboardListener(document) {
       callback(command);
     }
   }
+  function setPlayer(playerId) {
+    state.playerId = playerId;
+  }
 
   return {
     subscribe,
     unsubscribe,
+    setPlayer,
   };
 }
