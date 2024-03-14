@@ -4,13 +4,14 @@ export function createGame(screen) {
   const state = {
     players: {},
     fruits: {},
+    poisons: {},
     screen: {
       width: screen.width,
       height: screen.height,
     },
   };
   const observers = [];
-  console.log(observers);
+  const poisonTimers = {};
   function subscribe({ id, callback }) {
     observers.push({ id, callback });
   }
@@ -19,6 +20,23 @@ export function createGame(screen) {
     for (const { callback } of observers) {
       callback(command);
     }
+  }
+
+  function addPoison({
+    poisonId,
+    poisonX = generatePosition(screen.with),
+    poisonY = generatePosition(screen.height),
+  }) {
+    state.poisons[poisonId] = {
+      x: poisonX,
+      y: poisonY,
+    };
+    setTimeout(() => removePoison({ poisonId }), 4000);
+    notifyAll({ type: "add-poison", poisonId, poisonX, poisonY });
+  }
+  function removePoison({ poisonId }) {
+    delete state.poisons[poisonId];
+    notifyAll({ type: "remove-poison", poisonId });
   }
 
   function movePlayer({ type, playerId, keyPressed }) {
@@ -45,16 +63,17 @@ export function createGame(screen) {
       }
     };
     const moveset = {
-      ArrowDown: onMoveDown,
-      ArrowUp: onMoveUp,
-      ArrowLeft: onMoveLeft,
-      ArrowRight: onMoveRight,
+      ArrowDown: player.isPoisoned ? onMoveUp : onMoveDown,
+      ArrowUp: player.isPoisoned ? onMoveDown : onMoveUp,
+      ArrowLeft: player.isPoisoned ? onMoveRight : onMoveLeft,
+      ArrowRight: player.isPoisoned ? onMoveLeft : onMoveRight,
     };
 
     const onMove = moveset[keyPressed];
     if (onMove && player) {
       onMove(player);
       checkFruitCollision(playerId);
+      checkPoisonCollision(playerId);
     }
   }
   function addPlayer({
@@ -66,6 +85,7 @@ export function createGame(screen) {
       x: playerX,
       y: playerY,
       point: 0,
+      isPoisoned: false,
     };
     notifyAll({ type: "add-player", playerId, playerX, playerY });
   }
@@ -105,12 +125,43 @@ export function createGame(screen) {
       }
     }
   }
+  function unPoisonPlayer({ playerId }) {
+    const player = state.players[playerId];
+    if (player) {
+      player.isPoisoned = false;
+      notifyAll({ type: "unpoison-player", playerId });
+    }
+  }
+  function poisonPlayer({ playerId }) {
+    const player = state.players[playerId];
+    if (player.isPoisoned) {
+      const timer = poisonTimers[playerId];
+      clearTimeout(timer);
+    }
+    player.isPoisoned = true;
+    poisonTimers[playerId] = setTimeout(
+      () => unPoisonPlayer({ playerId }),
+      7000
+    );
+    notifyAll({ type: "poison-player", playerId });
+  }
+  function checkPoisonCollision(playerId) {
+    const player = state.players[playerId];
+    for (const poisonId in state.poisons) {
+      const poison = state.poisons[poisonId];
+      if (poison.x === player.x && poison.y === player.y) {
+        removePoison({ poisonId });
+        poisonPlayer({ playerId });
+      }
+    }
+  }
   function start() {
     const frequency = 5000;
     setInterval(() => {
       addFruit({
         fruitId: Math.random().toString(),
       });
+      addPoison({ poisonId: Math.random().toString() });
     }, frequency);
   }
 
@@ -127,6 +178,10 @@ export function createGame(screen) {
     setState,
     subscribe,
     start,
+    addPoison,
+    removePoison,
+    poisonPlayer,
+    unPoisonPlayer,
     state,
   };
 }

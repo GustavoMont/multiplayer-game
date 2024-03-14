@@ -17,6 +17,11 @@ export function renderScreen({
     context.fillStyle = "green";
     context.fillRect(fruit.x, fruit.y, SIZE, SIZE);
   }
+  for (const poisonId in game.state.poisons) {
+    const poison = game.state.poisons[poisonId];
+    context.fillStyle = "red";
+    context.fillRect(poison.x, poison.y, SIZE, SIZE);
+  }
   requestAnimationFrame(() =>
     renderScreen({ screen, game, requestAnimationFrame, currentPlayerId })
   );
