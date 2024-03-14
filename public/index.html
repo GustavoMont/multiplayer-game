@@ -69,6 +69,9 @@
           game.movePlayer(command);
         }
       });
+      socket.on("remove-fruit", ({ fruitId }) => {
+        game.removeFruit({ fruitId });
+      });
     </script>
   </body>
 </html>

@@ -22,6 +22,8 @@ game.subscribe({
   },
 });
 
+game.addFruit({ fruitId: "fruta", fruitX: 5, fruitY: 5 });
+
 io.on("connection", (socket) => {
   const playerId = socket.id;
   log(`Player connect in server with id: ${playerId}`);

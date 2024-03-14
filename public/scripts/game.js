@@ -80,6 +80,7 @@ export function createGame(screen) {
   }
   function removeFruit({ fruitId }) {
     delete state.fruits[fruitId];
+    notifyAll({ type: "remove-fruit" });
   }
   function checkFruitCollision(playerId) {
     const player = state.players[playerId];
