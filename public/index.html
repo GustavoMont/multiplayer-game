@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My First game</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
       #screen {
         border: 10px solid gray;
         image-rendering: pixelated;
@@ -13,12 +18,27 @@
         width: 400px;
         height: 400px;
       }
+      #game-state-log {
+        max-height: 20rem;
+        overflow-y: scroll;
+      }
+      .container {
+        display: flex;
+        gap: 2rem;
+        height: 100vh;
+      }
+      #game-info {
+        height: 100%;
+        overflow-y: auto;
+      }
     </style>
   </head>
   <body>
-    <canvas id="screen" width="10px" height="10px"></canvas>
+    <div class="container">
+      <canvas id="screen" width="10px" height="10px"></canvas>
+      <div id="game-info"></div>
+    </div>
 
-    <button id="freeze-btn">Congelar</button>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module">
       import { createKeyboardListener } from "./scripts/keyboard-listener.js";
@@ -29,15 +49,35 @@
       const socket = io();
       const game = createGame(screen);
       const keyboardListener = createKeyboardListener(document);
+      const gameInfo = document.querySelector("#game-info");
 
       socket.on("connect", () => {
-        const playerId = socket.id;
-        console.log(`Player connect in client with id: ${playerId}`);
+        const currentPlayerId = socket.id;
+        console.log(`Player connect in client with id: ${currentPlayerId}`);
+
+        game.subscribe({
+          id: "watch-game",
+          callback: () => {
+            let number = 0;
+            console.log(game.state.players);
+            gameInfo.innerHTML = "";
+            for (const playerId in game.state.players) {
+              number++;
+              const player = game.state.players[playerId];
+              const points = player.point;
+              const p = document.createElement("p");
+              const isCurrentPlayer = currentPlayerId === playerId;
+              p.style.color = isCurrentPlayer ? "green" : "gray";
+              p.style.fontWeight = isCurrentPlayer ? "bold" : "light";
+              p.innerText += `${number}. ${playerId}: ${points}`;
+              gameInfo.appendChild(p);
+            }
+          },
+        });
       });
       socket.on("setup", (state) => {
         const playerId = socket.id;
         game.setState(state);
-
         keyboardListener.setPlayer(playerId);
         keyboardListener.subscribe({
           id: "emit-move-player",

@@ -65,6 +65,7 @@ export function createGame(screen) {
     state.players[playerId] = {
       x: playerX,
       y: playerY,
+      point: 0,
     };
     notifyAll({ type: "add-player", playerId, playerX, playerY });
   }
@@ -87,12 +88,20 @@ export function createGame(screen) {
     delete state.fruits[fruitId];
     notifyAll({ type: "remove-fruit" });
   }
+  function incrementPlayerPoint({ playerId }) {
+    const player = state.players[playerId];
+    if (player) {
+      player.point++;
+    }
+    notifyAll({ type: "increment-player-point", playerId });
+  }
   function checkFruitCollision(playerId) {
     const player = state.players[playerId];
     for (const fruitId in state.fruits) {
       const fruit = state.fruits[fruitId];
       if (fruit.x === player.x && fruit.y === player.y) {
         removeFruit({ fruitId });
+        incrementPlayerPoint({ playerId });
       }
     }
   }
