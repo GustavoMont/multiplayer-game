@@ -40,7 +40,7 @@ export function createGame(screen) {
   }
 
   function movePlayer({ type, playerId, keyPressed }) {
-    const player = state.players[playerId];
+    const player = state.players[playerId] ?? {};
     notifyAll({ type, playerId, keyPressed });
     const onMoveDown = (player) => {
       if (player.y + 1 < 10) {
