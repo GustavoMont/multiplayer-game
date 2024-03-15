@@ -2,7 +2,6 @@ import { createKeyboardListener } from "./keyboard-listener.js";
 import { createGame } from "./game.js";
 import { renderScreen } from "./render-screen.js";
 const screen = document.querySelector("canvas#screen");
-const context = screen.getContext("2d");
 const socket = io();
 const game = createGame(screen);
 const keyboardListener = createKeyboardListener(document);
@@ -36,7 +35,7 @@ socket.on("setup", (state) => {
   game.setState(state);
   keyboardListener.setPlayer(playerId);
   keyboardListener.subscribe({
-    id: "emit-move-player",
+    id: "move-player",
     callback: game.movePlayer,
   });
   keyboardListener.subscribe({
@@ -61,7 +60,7 @@ socket.on("remove-player", ({ playerId }) => {
 });
 socket.on("move-player", (command) => {
   const playerId = socket.id;
-  if (command.playerId !== socket.id) {
+  if (command.playerId !== playerId) {
     game.movePlayer(command);
   }
 });
@@ -82,4 +81,8 @@ socket.on("poison-player", ({ playerId }) => {
 });
 socket.on("unpoison-player", ({ playerId }) => {
   game.addPoison({ playerId });
+});
+socket.on("disconnect", ({}) => {
+  keyboardListener.unsubscribe("move-player");
+  keyboardListener.unsubscribe("emit-move-player");
 });
