@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My First game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      #screen {
+        border: 10px solid gray;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        image-rendering: -moz-crisp-edges;
+        width: 400px;
+        height: 400px;
+      }
+      #game-state-log {
+        max-height: 20rem;
+        overflow-y: scroll;
+      }
+      .container {
+        display: flex;
+        gap: 2rem;
+        height: 100vh;
+      }
+      #game-info {
+        height: 100%;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="screen" width="10px" height="10px"></canvas>
+      <div id="game-info"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="./scripts/main.js"></script>
+  </body>
+</html>
