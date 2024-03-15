@@ -9,7 +9,8 @@ export function renderScreen({
   context.clearRect(0, 0, screen.width, screen.height);
   for (const playerId in game.state.players) {
     const player = game.state.players[playerId];
-    context.fillStyle = currentPlayerId === playerId ? "yellow" : "black";
+    context.fillStyle =
+      currentPlayerId === playerId ? getCurrentPlayerColor(player) : "black";
     context.fillRect(player.x, player.y, SIZE, SIZE);
   }
   for (const fruitId in game.state.fruits) {
@@ -25,4 +26,8 @@ export function renderScreen({
   requestAnimationFrame(() =>
     renderScreen({ screen, game, requestAnimationFrame, currentPlayerId })
   );
+}
+
+function getCurrentPlayerColor(player) {
+  return player.isPoisoned ? "#c75146" : "yellow";
 }
