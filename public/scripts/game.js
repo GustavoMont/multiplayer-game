@@ -9,9 +9,11 @@ export function createGame(screen) {
       width: screen.width,
       height: screen.height,
     },
+    isRunning: false,
   };
   const observers = [];
   const poisonTimers = {};
+  let spawnTimers = [];
   function subscribe({ id, callback }) {
     observers.push({ id, callback });
   }
@@ -155,14 +157,26 @@ export function createGame(screen) {
       }
     }
   }
+  function getPlayersCount() {
+    return Object.keys(state.players).length;
+  }
   function start() {
     const frequency = 5000;
-    setInterval(() => {
+    state.isRunning = true;
+    const timer = setInterval(() => {
       addFruit({
         fruitId: Math.random().toString(),
       });
       addPoison({ poisonId: Math.random().toString() });
     }, frequency);
+    spawnTimers.push(timer);
+  }
+  function end() {
+    spawnTimers.forEach((timer) => clearInterval(timer));
+    spawnTimers = [];
+    state.fruits = {};
+    state.poisons = {};
+    state.isRunning = false;
   }
 
   function setState(newState) {
@@ -182,6 +196,8 @@ export function createGame(screen) {
     removePoison,
     poisonPlayer,
     unPoisonPlayer,
+    end,
+    getPlayersCount,
     state,
   };
 }

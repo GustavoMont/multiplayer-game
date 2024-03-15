@@ -27,6 +27,10 @@ game.start();
 io.on("connection", (socket) => {
   const playerId = socket.id;
   log(`Player connect in server with id: ${playerId}`);
+  if (!game.state.isRunning) {
+    game.start();
+  }
+
   game.addPlayer({ playerId });
 
   socket.emit("setup", game.state);
@@ -36,6 +40,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     log(`Player ${playerId} saiu`);
     game.removePlayer({ playerId });
+
+    if (game.getPlayersCount() === 0) {
+      game.end();
+    }
   });
 });
 
