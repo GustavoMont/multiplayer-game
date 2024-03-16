@@ -13,7 +13,6 @@ const io = new Server(server);
 
 const PORT = 3000;
 
-log(game.state);
 game.subscribe({
   id: "game-state",
   callback(command) {
