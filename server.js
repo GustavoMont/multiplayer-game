@@ -22,8 +22,6 @@ game.subscribe({
   },
 });
 
-game.start();
-
 io.on("connection", (socket) => {
   const playerId = socket.id;
   log(`Player connect in server with id: ${playerId}`);
