@@ -16,7 +16,6 @@ const PORT = 3000;
 game.subscribe({
   id: "game-state",
   callback(command) {
-    log(`Emmiting ${command.type} - ${new Date().toISOString()}`);
     io.emit(command.type, command);
   },
 });

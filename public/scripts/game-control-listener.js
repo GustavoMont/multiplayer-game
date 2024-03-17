@@ -3,9 +3,7 @@ export function createGameControlListener(document) {
     observers: [],
   };
   const buttons = document.querySelectorAll("#game-control button");
-  const [upButton, leftButton, rightButton, downButton] = buttons;
-
-  buttons.forEach((button) => console.log(button.innerText));
+  const [leftButton, upButton, downButton, rightButton] = buttons;
 
   function handleClickButton(playerMove) {
     const playerId = state.playerId;

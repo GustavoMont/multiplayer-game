@@ -29,7 +29,6 @@ function onGameChange({ currentPlayerId, gameInfo }) {
 
 socket.on("connect", () => {
   const currentPlayerId = socket.id;
-  console.log(`Player connect in client with id: ${currentPlayerId}`);
 
   game.subscribe({
     id: "watch-game",

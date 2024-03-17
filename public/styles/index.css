@@ -9,9 +9,10 @@ body {
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
+  background-color: #212121;
 }
 #screen {
-  border: 10px solid gray;
+  border: 10px solid #121212;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   image-rendering: -moz-crisp-edges;
@@ -20,7 +21,7 @@ body {
   max-height: 500px;
 }
 #game-state-log {
-  max-height: 20rem;
+  max-height: 8rem;
   overflow-y: scroll;
 }
 .container {
@@ -29,29 +30,48 @@ body {
   height: 90vh;
   flex-direction: column;
   align-items: center;
-  border: 2px solid red;
 }
 #game-info {
   width: 100%;
   height: 100%;
-  border: 1px solid red;
-  display: none;
   overflow-y: auto;
-  max-width: 400px;
+  max-width: 350px;
+  max-height: 200px;
 }
 
 #game-control {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
 }
 
 #game-control button {
-  width: 45%;
+  border-radius: 0.5rem;
+  border: 1px solid #00b4d8;
+  background: #0077b6;
+  color: #fef;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.1s ease-in-out all;
+  transform: scale(1);
 }
 
-#game-control button[data-control-type="vertical"] {
-  width: 100%;
+#game-control button:active {
+  transform: scale(0.9);
+}
+
+#game-control button svg {
+  width: 1.5rem;
+  font-weight: bold;
+}
+
+.horizontal-controls-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 @media (min-width: 768px) {
@@ -74,6 +94,6 @@ body {
     align-items: flex-start;
   }
   #game-info {
-    display: block;
+    max-width: 400px;
   }
 }
