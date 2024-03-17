@@ -5,9 +5,9 @@ export function createKeyboardListener(document) {
 
   const handleKeyPress = (e) => {
     const playerId = state.playerId;
-    const keyPressed = e.key;
+    const playerMove = e.key;
 
-    notifyAll({ type: "move-player", playerId, keyPressed });
+    notifyAll({ type: "move-player", playerId, playerMove });
   };
   document.addEventListener("keydown", handleKeyPress);
 

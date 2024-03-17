@@ -26,7 +26,7 @@ export function createGame(screen) {
 
   function addPoison({
     poisonId,
-    poisonX = generatePosition(screen.with),
+    poisonX = generatePosition(screen.width),
     poisonY = generatePosition(screen.height),
   }) {
     state.poisons[poisonId] = {
@@ -41,9 +41,9 @@ export function createGame(screen) {
     notifyAll({ type: "remove-poison", poisonId });
   }
 
-  function movePlayer({ type, playerId, keyPressed }) {
+  function movePlayer({ type, playerId, playerMove }) {
     const player = state.players[playerId] ?? {};
-    notifyAll({ type, playerId, keyPressed });
+    notifyAll({ type, playerId, playerMove });
     const onMoveDown = (player) => {
       if (player.y + 1 < 10) {
         player.y += 1;
@@ -71,7 +71,7 @@ export function createGame(screen) {
       ArrowRight: player.isPoisoned ? onMoveLeft : onMoveRight,
     };
 
-    const onMove = moveset[keyPressed];
+    const onMove = moveset[playerMove];
     if (onMove && player) {
       onMove(player);
       checkFruitCollision(playerId);
