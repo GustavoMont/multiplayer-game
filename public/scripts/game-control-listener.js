@@ -22,6 +22,9 @@ export function createGameControlListener(document) {
     const observers = state.observers.filter(({ id }) => id !== observerId);
     state.observers = observers;
   }
+  function unsubscribeAll() {
+    state.observers = [];
+  }
   function notifyAll(command) {
     for (const { callback } of state.observers) {
       callback(command);
@@ -35,5 +38,6 @@ export function createGameControlListener(document) {
     subscribe,
     unsubscribe,
     setPlayer,
+    unsubscribeAll,
   };
 }

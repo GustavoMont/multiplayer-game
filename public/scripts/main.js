@@ -2,78 +2,37 @@ import { createKeyboardListener } from "./keyboard-listener.js";
 import { createGameControlListener } from "./game-control-listener.js";
 import { createGame } from "./game.js";
 import { renderScreen } from "./render-screen.js";
+import { onGameChange } from "./client-game/game-state-display.js";
+import { onResizeScreen } from "./client-game/player-move-handler.js";
+
 const screen = document.querySelector("canvas#screen");
 const socket = io();
 const game = createGame(screen);
 const keyboardListener = createKeyboardListener(document);
 const gameControlListener = createGameControlListener(document);
-const gameControl = document.querySelector("#game-control");
+
+const moveListeners = [gameControlListener, keyboardListener];
 
 const gameInfo = document.querySelector("#game-info");
-
-function onGameChange({ currentPlayerId, gameInfo }) {
-  let number = 0;
-  gameInfo.innerHTML = "";
-  for (const playerId in game.state.players) {
-    number++;
-    const player = game.state.players[playerId];
-    const points = player.point;
-    const p = document.createElement("p");
-    const isCurrentPlayer = currentPlayerId === playerId;
-    p.style.color = isCurrentPlayer ? "green" : "gray";
-    p.style.fontWeight = isCurrentPlayer ? "bold" : "light";
-    p.innerText += `${number}. ${playerId}: ${points}`;
-    gameInfo.appendChild(p);
-  }
-}
 
 socket.on("connect", () => {
   const currentPlayerId = socket.id;
 
   game.subscribe({
     id: "watch-game",
-    callback: () => onGameChange({ currentPlayerId, gameInfo }),
+    callback: () =>
+      onGameChange({ currentPlayerId, gameInfo, gameState: game.state }),
   });
   const resizeObserver = new ResizeObserver(([entry]) =>
     onResizeScreen({
       body: entry.target,
-      gameControl,
-      playerId: currentPlayerId,
+      game,
+      socket,
+      listeners: moveListeners,
     })
   );
   resizeObserver.observe(document.body);
 });
-
-function subscribeMoveListener({ playerId = "", moveListener }) {
-  moveListener.setPlayer(playerId);
-  moveListener.subscribe({
-    id: "move-player",
-    callback: game.movePlayer,
-  });
-  moveListener.subscribe({
-    id: "emit-move-player",
-    callback: ({ playerId, playerMove, type }) => {
-      socket.emit("move-player", { type, playerId, playerMove });
-    },
-  });
-}
-
-function onResizeScreen({ body, gameControl, playerId }) {
-  const ids = ["move-player", "emit-move-player"];
-  ids.forEach((id) => {
-    keyboardListener.unsubscribe(id);
-    gameControlListener.unsubscribe(id);
-  });
-
-  gameControl.style.display = body.clientWidth > 769 ? "none" : "flex";
-
-  const gameControlDisplay = gameControl.style.display;
-  const hasControlButton = gameControlDisplay !== "none";
-  const moveListener = hasControlButton
-    ? gameControlListener
-    : keyboardListener;
-  subscribeMoveListener({ playerId, moveListener });
-}
 
 socket.on("setup", (state) => {
   const playerId = socket.id;
@@ -117,6 +76,5 @@ socket.on("unpoison-player", ({ playerId }) => {
   game.addPoison({ playerId });
 });
 socket.on("disconnect", ({}) => {
-  keyboardListener.unsubscribe("move-player");
-  keyboardListener.unsubscribe("emit-move-player");
+  moveListeners.forEach((listener) => listener.unsubscribeAll());
 });

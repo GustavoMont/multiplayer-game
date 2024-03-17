@@ -18,6 +18,9 @@ export function createKeyboardListener(document) {
     const observers = state.observers.filter(({ id }) => id !== observerId);
     state.observers = observers;
   }
+  function unsubscribeAll() {
+    state.observers = [];
+  }
   function notifyAll(command) {
     for (const { callback } of state.observers) {
       callback(command);
@@ -31,5 +34,6 @@ export function createKeyboardListener(document) {
     subscribe,
     unsubscribe,
     setPlayer,
+    unsubscribeAll,
   };
 }
