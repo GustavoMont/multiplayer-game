@@ -1,15 +1,19 @@
-export function createKeyboardListener(document) {
+export function createGameControlListener(document) {
   const state = {
     observers: [],
   };
+  const buttons = document.querySelectorAll("#game-control button");
+  const [leftButton, upButton, downButton, rightButton] = buttons;
 
-  const handleKeyPress = (e) => {
+  function handleClickButton(playerMove) {
     const playerId = state.playerId;
-    const playerMove = e.key;
-
     notifyAll({ type: "move-player", playerId, playerMove });
-  };
-  document.addEventListener("keydown", handleKeyPress);
+  }
+
+  upButton.addEventListener("click", () => handleClickButton("ArrowUp"));
+  leftButton.addEventListener("click", () => handleClickButton("ArrowLeft"));
+  rightButton.addEventListener("click", () => handleClickButton("ArrowRight"));
+  downButton.addEventListener("click", () => handleClickButton("ArrowDown"));
 
   function subscribe({ id, callback }) {
     state.observers.push({ id, callback });

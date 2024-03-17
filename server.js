@@ -13,16 +13,12 @@ const io = new Server(server);
 
 const PORT = 3000;
 
-log(game.state);
 game.subscribe({
   id: "game-state",
   callback(command) {
-    log(`Emmiting ${command.type} - ${new Date().toISOString()}`);
     io.emit(command.type, command);
   },
 });
-
-game.start();
 
 io.on("connection", (socket) => {
   const playerId = socket.id;
