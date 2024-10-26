@@ -24,7 +24,7 @@ export function renderScreen({
     context.fillRect(poison.x, poison.y, SIZE, SIZE);
   }
   requestAnimationFrame(() =>
-    renderScreen({ screen, game, requestAnimationFrame, currentPlayerId })
+    renderScreen({ screen, game, requestAnimationFrame, currentPlayerId }),
   );
 }
 

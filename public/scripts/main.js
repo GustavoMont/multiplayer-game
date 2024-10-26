@@ -3,6 +3,7 @@ import { createGameControlListener } from "./game-control-listener.js";
 import { createGame } from "./game.js";
 import { renderScreen } from "./render-screen.js";
 const screen = document.querySelector("canvas#screen");
+// eslint-disable-next-line no-undef
 const socket = io();
 const game = createGame(screen);
 const keyboardListener = createKeyboardListener(document);
@@ -39,7 +40,7 @@ socket.on("connect", () => {
       body: entry.target,
       gameControl,
       playerId: currentPlayerId,
-    })
+    }),
   );
   resizeObserver.observe(document.body);
 });
@@ -116,7 +117,7 @@ socket.on("poison-player", ({ playerId }) => {
 socket.on("unpoison-player", ({ playerId }) => {
   game.addPoison({ playerId });
 });
-socket.on("disconnect", ({}) => {
+socket.on("disconnect", () => {
   keyboardListener.unsubscribe("move-player");
   keyboardListener.unsubscribe("emit-move-player");
 });
