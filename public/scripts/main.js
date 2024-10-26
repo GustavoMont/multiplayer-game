@@ -40,7 +40,7 @@ socket.on("connect", () => {
       body: entry.target,
       gameControl,
       playerId: currentPlayerId,
-    })
+    }),
   );
   resizeObserver.observe(document.body);
 });

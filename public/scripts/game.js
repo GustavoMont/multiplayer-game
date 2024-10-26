@@ -143,7 +143,7 @@ export function createGame(screen) {
     player.isPoisoned = true;
     poisonTimers[playerId] = setTimeout(
       () => unPoisonPlayer({ playerId }),
-      7000
+      7000,
     );
     notifyAll({ type: "poison-player", playerId });
   }
