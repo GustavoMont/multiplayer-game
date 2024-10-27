@@ -76,6 +76,18 @@ function onResizeScreen({ body, gameControl, playerId }) {
   subscribeMoveListener({ playerId, moveListener });
 }
 
+function startGame() {
+  const pathname = window.location.pathname;
+  const [, , roomId] = pathname.split("/");
+  if (roomId) {
+    alert(roomId);
+    socket.emit("enter_room", { roomId });
+  }
+  socket.emit("start-game");
+}
+
+startGame();
+
 socket.on("setup", (state) => {
   const playerId = socket.id;
   game.setState(state);
